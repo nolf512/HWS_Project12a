@@ -13,13 +13,19 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
     
     var people = [Person]()
     
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewPerson))
         
+        
+        let defaults = UserDefaults.standard
+        
+        if let savedPeople = defaults.object(forKey: "people") as? Data {
+            if let decoderPeople = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(savedPeople) as? [Person] {
+                people = decoderPeople
+            }
+        }
         
     }
 
@@ -56,6 +62,8 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         present(picker, animated: true, completion: nil)
     }
     
+    
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         //UIImageとして存在するかのチェック
@@ -73,10 +81,15 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         
         let person = Person(name: "unknown", image: imageName)
         people.append(person)
+        save()
         collectionView.reloadData()
         
         dismiss(animated: true, completion: nil)
     }
+    
+    
+    
+    
     
     //ディレクトリの場所を取得
     func getDocumentsDirectory() -> URL {
@@ -99,14 +112,24 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
             guard let newName = ac?.textFields?[0].text else { return }
             person.name = newName
             
+            //userDefaults
+            self?.save()
+            
+            
             self?.collectionView.reloadData()
         })
         
         present(ac, animated: true)
     }
     
-    
+    func save(){
+        if let saveData = try? NSKeyedArchiver.archivedData(withRootObject: people, requiringSecureCoding: false) {
+            let defaults = UserDefaults.standard
+            defaults.set(saveData, forKey: "people")
+        }
+    }
     
     
 }
+
 
