@@ -94,6 +94,7 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         
         ac.addTextField()
         
+        //textFieldに入力された名前に変更
         ac.addAction(UIAlertAction(title: "OK", style: .default) { [ weak self, weak ac] _ in
             guard let newName = ac?.textFields?[0].text else { return }
             person.name = newName
@@ -103,6 +104,8 @@ class ViewController: UICollectionViewController, UIImagePickerControllerDelegat
         
         present(ac, animated: true)
     }
+    
+    
     
     
 }
